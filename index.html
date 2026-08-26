@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0c10">
+  <title>Live TV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="lockScreen" class="lock-screen">
+  <div class="lock-card">
+    <h1>LIVE TV</h1>
+    <p>Enter the access password to continue</p>
+    <input id="lockPasswordInput" class="text-input" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="lockSubmitBtn" class="soft-btn primary lock-submit">Unlock</button>
+    <p id="lockError" class="lock-error"></p>
+  </div>
+</div>
+
+<div id="app" class="app">
+
+  <!-- HOME -->
+  <section id="homePage" class="page active">
+    <header class="home-header">
+      <div>
+        <h1>LIVE TV</h1>
+        <p>Watch your favourite channels</p>
+      </div>
+      <button class="icon-btn edit-home-btn" id="homeEditBtn" onclick="toggleChannelEdit()">Edit</button>
+      <button class="icon-btn" onclick="lockSite()" title="Lock this device">Lock</button>
+    </header>
+    <main id="channelGrid" class="channel-grid"></main>
+  </section>
+
+  <!-- CHANNEL / SERIALS -->
+  <section id="channelPage" class="page">
+    <header class="sub-header">
+      <button class="back-btn" onclick="goHome()" aria-label="Back">‹</button>
+      <div class="sub-title-wrap">
+        <h1 id="channelTitle">Channel</h1>
+        <span id="channelSubtitle">Serials</span>
+      </div>
+      <button class="icon-btn" onclick="toggleSerialEdit()">Edit</button>
+    </header>
+    <main id="serialGrid" class="poster-grid"></main>
+  </section>
+
+  <!-- SERIAL / EPISODES -->
+  <section id="serialPage" class="page">
+    <header class="sub-header">
+      <button class="back-btn" onclick="goChannel()" aria-label="Back">‹</button>
+      <div class="sub-title-wrap">
+        <h1 id="serialTitle">Serial</h1>
+        <span id="serialSubtitle">Season 1</span>
+      </div>
+      <button class="close-btn" onclick="goChannel()" aria-label="Close">×</button>
+    </header>
+
+    <div class="latest-wrap">
+      <button id="latestBtn" class="latest-btn" onclick="watchLatest()">
+        <span class="play-symbol">▶</span>
+        <span id="latestText">Watch Latest Episode</span>
+      </button>
+    </div>
+
+    <div class="episode-toolbar">
+      <button class="soft-btn" onclick="toggleEpisodeEdit()">Edit Episodes</button>
+      <button class="soft-btn primary" onclick="openEpisodeEditor(null)">+ Add Episode</button>
+    </div>
+
+    <section class="episodes">
+      <div class="season-heading">
+        <h2>Season 1</h2>
+        <div class="season-underline"></div>
+      </div>
+      <div id="episodeList"></div>
+    </section>
+  </section>
+</div>
+
+<!-- CHANNEL EDIT MODAL -->
+<div id="channelModal" class="modal" onclick="backdropClose(event,'channelModal')">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="channelModalTitle">Add Channel</h2>
+      <button class="close-modal" onclick="closeModal('channelModal')">×</button>
+    </div>
+
+    <label class="field-label">Channel name</label>
+    <input id="channelNameInput" class="text-input" type="text" placeholder="Star Jalsha">
+
+    <label class="field-label">Channel image</label>
+    <div class="image-row">
+      <input id="channelImageFile" class="file-input" type="file" accept="image/*">
+      <button class="choose-btn" onclick="document.getElementById('channelImageFile').click()">Choose image</button>
+    </div>
+    <label class="field-label">Or image link</label>
+    <input id="channelImageUrl" class="text-input" type="url" placeholder="https://example.com/logo.jpg">
+    <div class="image-preview" id="channelPreview"></div>
+
+    <div class="modal-actions">
+      <button class="soft-btn" onclick="closeModal('channelModal')">Cancel</button>
+      <button class="soft-btn primary" onclick="saveChannel()">Save</button>
+      <button id="deleteChannelBtn" class="soft-btn danger" onclick="deleteChannel()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- SERIAL EDIT MODAL -->
+<div id="serialModal" class="modal" onclick="backdropClose(event,'serialModal')">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="serialModalTitle">Add Serial</h2>
+      <button class="close-modal" onclick="closeModal('serialModal')">×</button>
+    </div>
+
+    <label class="field-label">Serial name</label>
+    <input id="serialNameInput" class="text-input" type="text" placeholder="Tilottama">
+
+    <label class="field-label">Serial image</label>
+    <div class="image-row">
+      <input id="serialImageFile" class="file-input" type="file" accept="image/*">
+      <button class="choose-btn" onclick="document.getElementById('serialImageFile').click()">Choose image</button>
+    </div>
+    <label class="field-label">Or image link</label>
+    <input id="serialImageUrl" class="text-input" type="url" placeholder="https://example.com/poster.jpg">
+    <div class="image-preview" id="serialPreview"></div>
+
+    <div class="modal-actions">
+      <button class="soft-btn" onclick="closeModal('serialModal')">Cancel</button>
+      <button class="soft-btn primary" onclick="saveSerial()">Save</button>
+      <button id="deleteSerialBtn" class="soft-btn danger" onclick="deleteSerial()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- EPISODE EDIT MODAL -->
+<div id="episodeModal" class="modal" onclick="backdropClose(event,'episodeModal')">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="episodeModalTitle">Add Episode</h2>
+      <button class="close-modal" onclick="closeModal('episodeModal')">×</button>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <label class="field-label">Episode number</label>
+        <input id="episodeNoInput" class="text-input" type="number" min="1" placeholder="14">
+      </div>
+      <div>
+        <label class="field-label">Date</label>
+        <input id="episodeDateInput" class="text-input" type="date">
+      </div>
+    </div>
+
+    <label class="field-label">Episode title</label>
+    <input id="episodeTitleInput" class="text-input" type="text" placeholder="Tomosha Fakes an Illness">
+
+    <label class="field-label">Episode image</label>
+    <div class="image-row">
+      <input id="episodeImageFile" class="file-input" type="file" accept="image/*">
+      <button class="choose-btn" onclick="document.getElementById('episodeImageFile').click()">Choose image</button>
+    </div>
+    <label class="field-label">Or image link</label>
+    <input id="episodeImageUrl" class="text-input" type="url" placeholder="https://example.com/episode.jpg">
+    <div class="image-preview" id="episodePreview"></div>
+
+    <label class="field-label">Duration</label>
+    <input id="episodeDurationInput" class="text-input" type="text" placeholder="23m">
+
+    <label class="field-label">Video link</label>
+    <input id="episodeVideoInput" class="text-input" type="url" placeholder="https://example.com/video.mp4">
+
+    <div class="modal-actions">
+      <button class="soft-btn" onclick="closeModal('episodeModal')">Cancel</button>
+      <button class="soft-btn primary" onclick="saveEpisode()">Save</button>
+      <button id="deleteEpisodeBtn" class="soft-btn danger" onclick="deleteEpisode()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER -->
+<div id="videoModal" class="video-modal" onclick="videoBackdrop(event)">
+  <div class="video-shell">
+    <button class="video-close" onclick="closeVideo()">×</button>
+    <video id="videoPlayer" controls playsinline></video>
+    <div id="videoFallback" class="video-fallback">
+      <p>This video link cannot be played directly in the browser.</p>
+      <a id="openVideoLink" href="#" target="_blank" rel="noopener">Open video link</a>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
