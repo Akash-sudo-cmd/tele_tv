@@ -29,4 +29,4 @@ const firebaseConfig = {
 //
 //   3. Copy the printed hash and paste it below.
 // ====================================================================
-const SITE_PASSWORD_HASH = "PASTE_YOUR_PASSWORD_HASH_HERE";
+const SITE_PASSWORD_HASH = "d0313478cf91b5959009ecff1b9fc4ba0345d7ac0616e2b1b339327433081248";
